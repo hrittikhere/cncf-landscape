@@ -52,11 +52,13 @@ func main(){
 		fmt.Println("Error parsing config file: ", err)
 	}
 
-	for _, feed := range landscapeconfig.Landscape {	
-			newfeed:=feed.Subcategories
+	for i , feed := range landscapeconfig.Landscape {	
+			newfeed:=feed.Subcategories[0].Items
 			
-
-			fmt.Print(nesfeed)
+			// Parse inside category and subcategory
+			fmt.Println(i, newfeed)
+			fmt.Println(" ")
+			fmt.Println(" ")
 	}
 
 }
