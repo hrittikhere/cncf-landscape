@@ -1,11 +1,10 @@
-package main 
+package main
 
 import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 )
-
 
 // Subcategories
 type Subcategories struct {
@@ -37,28 +36,30 @@ type Landscape struct {
 	Name          string          `yaml:"name"`
 }
 
-
-func main(){
+func main() {
 
 	landscape, err := ioutil.ReadFile("landscape.yml")
 	if err != nil {
 		fmt.Println("Error reading config file: ", err)
 	}
 
-	var landscapeconfig LandscapeSchema 
+	var landscapeconfig LandscapeSchema
 
 	err = yaml.Unmarshal(landscape, &landscapeconfig)
 	if err != nil {
 		fmt.Println("Error parsing config file: ", err)
 	}
 
-	for i , feed := range landscapeconfig.Landscape {	
-			newfeed:=feed.Subcategories[0].Items
-			
-			// Parse inside category and subcategory
-			fmt.Println(i, newfeed)
-			fmt.Println(" ")
-			fmt.Println(" ")
+	for _, feed := range landscapeconfig.Landscape {
+		for _, subcategory := range feed.Subcategories {
+			for _, item := range subcategory.Items {
+				RepoUrl := item.RepoUrl
+				if (RepoUrl == "") {
+					fmt.Println( item.Name)
+				}
+			}
+
+		}
 	}
 
 }
