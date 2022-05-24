@@ -6,7 +6,6 @@ import (
 	"github.com/mmcdole/gofeed"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
-	"strings"
 	"time"
 )
 
