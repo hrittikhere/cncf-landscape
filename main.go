@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/hrittikhere/cncf-landscape/platforms"
+	"github.com/mmcdole/gofeed"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"strings"
 	"time"
-	// "github.com/hrittikhere/cncf-landscape/platforms"
-	"github.com/mmcdole/gofeed"
 )
 
 // Subcategories
@@ -52,13 +53,23 @@ func main() {
 	if err != nil {
 		fmt.Println("Error parsing config file: ", err)
 	}
+	// fmt.Println("Starting Landscape Loop", len(landscapeconfig.Landscape))
 
-	for _, feed := range landscapeconfig.Landscape {
-		for _, subcategory := range feed.Subcategories {
+	for _, category := range landscapeconfig.Landscape {
+		// fmt.Println("Currently inspecting category ", index)
+		// fmt.Println("Starting subcategory Loop", len(category.Subcategories))
+
+		for _, subcategory := range category.Subcategories {
+			// fmt.Println("Currently inspecting subcategory ", index)
+			// fmt.Println("Starting items Loop", len(subcategory.Items))
+
 			for _, item := range subcategory.Items {
+				// fmt.Println("Currently inspecting item ", index)
+
 				if !(item.RepoUrl == "") {
-				rssFeed := item.RepoUrl+"/releases.atom"
-				parser(rssFeed)
+					rssFeed := item.RepoUrl + "/releases.atom"
+
+					parser(rssFeed, item.Name)
 				}
 			}
 
@@ -67,38 +78,36 @@ func main() {
 
 }
 
+func parser(feedLink string, itemName string) {
 
-func parser(feedLink string){
-	
 	fp := gofeed.NewParser()
 
-	feed, _ := fp.ParseURL(feedLink)
+	feed, err := fp.ParseURL(feedLink)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(" number of feed items: ", len(feed.Items))
 
 	for _, item := range feed.Items {
-
+		// fmt.Println("Currently Inspecting Feed Item", item.Link)
 		NowTime := time.Now()
 		ParsedNowTime := time.Unix(NowTime.Unix(), 0)
 
 		PublishedTime := item.PublishedParsed
 		ParsedPublishedTime := time.Unix(PublishedTime.Unix(), 0)
 
-		if ParsedNowTime.Sub(ParsedPublishedTime).Hours() < 400 {
+		if ParsedNowTime.Sub(ParsedPublishedTime).Hours() < 6 {
 			// 0 */4 * * *
-			// PostTitle := item.Title
-			// PostLink := item.Link
-			// PostDescription := item.Description
-			// PostPublished := item.Published
-			// Categories := feed.Categories
-			
+			PostTitle := item.Title
+			PostLink := item.Link
 
-			// fmt.Printf("%s \n %s %s \n %s %s \n", PostTitle, PostLink, PostDescription, PostPublished, Categories)
-			fmt.Println(item.Link)
-			fmt.Println("====================================================")
-			// Tweet := fmt.Sprintf("%s was published by %s 🎉🎉🎉 \n %s ", PostTitle, PostLink)
+			Tweet := fmt.Sprintf("%s is released by %s 🎉🎉🎉 \n %s ", PostTitle, itemName, PostLink)
 
-			// TweeetId, _ := cmd.PublishToTwitter(Tweet)
+			TweeetId, _ := cmd.PublishToTwitter(Tweet)
 
-			// fmt.Println(TweeetId, "Posted")
+			fmt.Println(TweeetId, "Posted")
 
 		}
 
