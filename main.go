@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hrittikhere/cncf-landscape/platforms"
+	"github.com/hrittikhere/cncf-landscape/synk"
 	"github.com/mmcdole/gofeed"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -87,7 +87,7 @@ func parser(feedLink string, itemName string) {
 		return
 	}
 
-	fmt.Println(" number of feed items: ", len(feed.Items))
+	// fmt.Println(" number of feed items: ", len(feed.Items))
 
 	for _, item := range feed.Items {
 		// fmt.Println("Currently Inspecting Feed Item", item.Link)
@@ -101,12 +101,14 @@ func parser(feedLink string, itemName string) {
 			// 0 */4 * * *
 			PostTitle := item.Title
 			PostLink := item.Link
-
+			fmt.Println(PostLink)
 			Tweet := fmt.Sprintf("%s is released by %s 🎉🎉🎉 \n %s ", PostTitle, itemName, PostLink)
+			fmt.Println(Tweet)
 
-			TweeetId, _ := cmd.PublishToTwitter(Tweet)
-
-			fmt.Println(TweeetId, "Posted")
+			TweeetId, err := cmd.PublishToTwitter(Tweet)
+			if err != nil {
+				fmt.Println(TweeetId, "Posted")
+			}
 
 		}
 
